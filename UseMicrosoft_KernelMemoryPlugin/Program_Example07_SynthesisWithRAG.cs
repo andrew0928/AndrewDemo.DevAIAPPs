@@ -176,7 +176,8 @@ namespace UseMicrosoft_KernelMemoryPlugin
             builder
                 .AddOpenAIChatCompletion(
                     //modelId: "gpt-4o",
-                    modelId: "o1",
+                    //modelId: "o1",
+                    modelId: "o3",
                     apiKey: OPENAI_APIKEY,
                     httpClient: HttpLogger.GetHttpClient(false));
 
@@ -224,11 +225,14 @@ namespace UseMicrosoft_KernelMemoryPlugin
                     A{n}: {回答}
 
                     Step 5. 用解決問題 Case 的型態來歸納文章的摘要。找出文章內提了那些問題 (Problem)，並且有說明原因 (RootCause)，解法 (Resolution)，案例 (Example) 的結構，沒有上限，條列給我。
+                    ## Problem Solving
                     Case {n}: {標題}
                     - Problem: {問題敘述}
                     - RootCause: {原因分析}
                     - Resolution: {解決方案}
+                    - Analysis: {分析說明, 用 3x5 why 的原則來分析, 給我分析表格, 無法追溯的上層原因, 就留空白。表格欄位放 3 面向, 5行 放五層上層原因}
                     - Example: {案例說明}
+
 
                     --
                     以上是任務需求, 後續我上傳文章內容後，就可以開始回覆
@@ -273,7 +277,7 @@ namespace UseMicrosoft_KernelMemoryPlugin
 
 
 
-                history.AddUserMessage("繼續");
+                history.AddUserMessage("繼續 Step 2. 全文層級摘要");
 
                 var abstract_part = await CacheIfAsync(
                     Path.Combine(synthesis_folder, $"{filename}-abstract.md"),
@@ -298,7 +302,7 @@ namespace UseMicrosoft_KernelMemoryPlugin
 
 
 
-                history.AddUserMessage("繼續");
+                history.AddUserMessage("繼續 Step 3. 段落層級摘要");
 
                 var paragraph_part = await CacheIfAsync(
                     Path.Combine(synthesis_folder, $"{filename}-paragraph.md"),
@@ -320,7 +324,7 @@ namespace UseMicrosoft_KernelMemoryPlugin
 
 
 
-                history.AddUserMessage("繼續");
+                history.AddUserMessage("繼續 Step 4. 用 FAQ 型態歸納文章的摘要");
 
                 var question_part = await CacheIfAsync(
                     Path.Combine(synthesis_folder, $"{filename}-question.md"),
@@ -339,7 +343,11 @@ namespace UseMicrosoft_KernelMemoryPlugin
                 Console.ResetColor();
                 Console.WriteLine(question_part);
 
-                history.AddUserMessage("繼續");
+
+
+
+
+                history.AddUserMessage("繼續 Step 5. 用解決問題 Case 的型態來歸納文章的摘要");
                 var problem_part = await CacheIfAsync(
                     Path.Combine(synthesis_folder, $"{filename}-problem.md"),
                     async () =>
